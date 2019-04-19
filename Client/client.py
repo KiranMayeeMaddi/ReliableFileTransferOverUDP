@@ -1,3 +1,10 @@
+'''
+client.py
+Go Back N protocol using UDP Sockets
+Authors :-
+Sai Kiran Mayee Maddi 200257327 smaddi@ncsu.edu
+Abhishek Arya 200206728 aarya@ncsu.edu
+'''
 
 import sys
 import socket
@@ -12,7 +19,7 @@ retransmissionTime = 0.1  # RTT value
 
 # Initialization
 dataPackets = []
-previousAck = -1 # intial value
+previousAck = -1
 inTransitSize = 0
 timeStamp = []
 windowLock = threading.Lock()
