@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 server.py
 Go Back N protocol using UDP Sockets
@@ -5,13 +6,14 @@ Authors :-
 Sai Kiran Mayee Maddi 200257327 smaddi@ncsu.edu
 Abhishek Arya 200206728 aarya@ncsu.edu
 '''
-
+import sys
 import socket
+import struct
+import random
 
 # Constants
 TYPE_DATA = 21845  # 0101010101010101
 TYPE_ACK = 43690  # 1010101010101010
-
 
 def checksum_verification(data, obtainedCheckSum):
     checkSum = 0
@@ -32,9 +34,9 @@ def dessemble_packet(packet):
     header = struct.unpack('!IHH', packet[0:8])
     sequenceNum, checkSum, data = header[0], header[1], packet[8:]
     isValidDataPacket = False
-    verifiedChecksum = checksum_verification(data,check_sum)
+    verifiedChecksum = checksum_verification(data, checkSum)
     if verifiedChecksum == 0 and header[2] == TYPE_DATA:
-        isValidDataPacket = False
+        isValidDataPacket = True
     return isValidDataPacket, sequenceNum, data
 
 
@@ -46,9 +48,11 @@ def main():
     # Getting the values of server port number, file name, probability at which a packet can be lost
     serverPortNum = 7735 if sys.argv[1] != '7735' else int(sys.argv[1])
     fileName = sys.argv[2]
-    probability = sys.argv[3]
+    probability = float(sys.argv[3])
 
     serverIP = socket.gethostbyname(socket.gethostname()) # IP address of the server (current machine)
+
+    print("\nServer IP Address: {}\nServer Port Number: {}\n".format(serverIP, serverPortNum))
 
     serverSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     serverSocket.bind((serverIP, serverPortNum))
@@ -63,18 +67,18 @@ def main():
         isValidDataPacket, sequenceNum, data = dessemble_packet(data)
 
         if isValidDataPacket:
-            if random.uniform(0, 1) > prob:  # packet accepted
+            if random.uniform(0, 1) > probability:  # packet accepted
                 if sequenceNum == previousSeqNum + 1:
                     ackPacket = create_ack_header(sequenceNum)
                     serverSocket.sendto(ackPacket, clientAddress)
                     if data == "EOF":
                         flag = False
-                        print("End of file is receached at sequence number {}".format(sequenceNum))
+                        print("End of file is receached at sequence number {}".format(str(sequenceNum)))
                         break
                     filePtr.write(data)
                     previousSeqNum = sequenceNum
             else:
-                print("Packet Loss, Sequence Number = {}".format(str(sequence_number))
+                print("Packet Loss, Sequence Number = {}".format(str(sequenceNum)))
 
     print("File Received. Closing Connection!")
 

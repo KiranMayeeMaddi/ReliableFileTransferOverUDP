@@ -36,7 +36,7 @@ def rdt_send(serverAddress, clientSocket, N):
     global inTransitSize
     global timeStamp
 
-    timeStamp = [len(dataPackets)]
+    timeStamp = [None]* len(dataPackets)
 
     while previousAck + 1 < len(dataPackets):
         windowLock.acquire() # Locks the execution
@@ -185,6 +185,7 @@ def main():
     clientSocket.bind((clientIP, clientPortNum))
     serverAddress = (serverIP, serverPortNum)
 
+    print("\nClient IP Address: {}\nClient Port Number: {}\nServer IP Address: {}\n".format(clientIP, clientPortNum, serverAddress))
     read_and_create_packet(fileName, MSS)
 
     # Starting the timer
@@ -206,7 +207,7 @@ def main():
     print("\nTransfer Complete!\n")
 
     # Time taken to send all the packets
-    print("Total time taken {} seconds.\n".format(time.time() - startTime))
+    print("Total time taken {} seconds.\n".format(str(time.time() - startTime)))
 
     # Closing the socket if it is still open
     if clientSocket:
