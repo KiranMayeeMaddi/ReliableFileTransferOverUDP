@@ -8,7 +8,34 @@ import time
 TYPE_DATA = 21845 #0101010101010101
 retransmissionTime = 0.1 #RTT value
 dataPackets = []
+windowLock = threading.Lock()
+previousAck = -1 # intial value
+timeStamp = []
 
+def rdt_send(serverAddress, clientSocket, N):
+    global dataPackets
+    global previousAck
+    global inTransitSize
+    global timeStamp
+
+    timeStamp = [len(Data_Packets)]
+
+    while previousAck + 1 < len(dataPackets):
+        windowLock.acquire()
+        packetCount = previousAck + In_Transit + 1
+        if inTransitSize < N and  packetCount < len(dataPackets)):
+            clientSocket.sendto(dataPackets[packetCount], serverAddress)
+            timeStamp[packetCount] = time.time()
+            inTransitSize += 1
+        if inTransitSize > 0:
+            if (time.time() - timeStamp[previousAck + 1]) > retransmissionTime:
+                print("Time out, Sequence Number = {}".format(str(previousAck + 1)))
+                inTransitSize = 0
+        windowLock.release()
+
+
+def ack_receiver(clientSocket):
+    print()
 
 
 '''
@@ -39,12 +66,15 @@ def create_packet(sequenceNum, data):
     dataPacket = header + data
     return dataPacket
 
+
 '''
 read_and_create_packet() checks if the given can be opened and read.
 calls create_packet() for appending the header and for creating the packet
 @params fileName, MSS which specify the name of the file and Maximum segment size
 '''
 def read_and_create_packet(fileName, MSS):
+    global dataPackets
+
     try:
         with open(fileName, 'rb') as filePtr: #read binary format
             sequenceNum = 0
