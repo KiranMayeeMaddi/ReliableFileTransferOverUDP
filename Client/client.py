@@ -2,6 +2,8 @@
 import sys
 from socket import *
 import struct
+import threading
+import time
 
 TYPE_DATA = 21845 #0101010101010101
 retransmissionTime = 0.1 #RTT value
@@ -9,14 +11,11 @@ dataPackets = []
 
 
 
-
-def ack_receiver(clientSocket):
-    print()
-
-def rdf_send(serverAddress, clientSocket, N):
-    print()
-
-
+'''
+Calculates the checksum which needs to be added to the header of the packet
+@params data
+@return checkSum which is a 16 bit value
+'''
 def checksum_calculation(data):
     checkSum = 0
     for i in range(0, len(data), 2):
@@ -27,19 +26,31 @@ def checksum_calculation(data):
     return ~(checkSum) & 0xffff
 
 
+'''
+create_packet() creates packets by appending header with the data
+Header has sequenceNum, checkSum, TYPE_DATA
+TYPE_DATA value indicates that this is a data packet
+@params sequenceNum, data
+@return dataPacket
+'''
 def create_packet(sequenceNum, data):
     checkSum = checksum_calculation(data)
     header = struct.pack('!IHH', sequenceNum, checkSum, TYPE_DATA)
     dataPacket = header + data
     return dataPacket
 
+'''
+read_and_create_packet() checks if the given can be opened and read.
+calls create_packet() for appending the header and for creating the packet
+@params fileName, MSS which specify the name of the file and Maximum segment size
+'''
 def read_and_create_packet(fileName, MSS):
     try:
-        with open(fileName, 'rb') as filePtr:
+        with open(fileName, 'rb') as filePtr: #read binary format
             sequenceNum = 0
             data = ''
             while True:
-                readOnebyte = filePtr.read(1)
+                readOnebyte = filePtr.read(1) # Reading one byte at a time
                 data += readOnebyte
                 if data == '':
                     break
@@ -47,9 +58,10 @@ def read_and_create_packet(fileName, MSS):
                     dataPackets.append(create_packet(sequenceNum, data))
                     data = ''
                     sequenceNum += 1
-            filePtr.close()
-    except:
+            filePtr.close() # Closing the file pointer
+    except: # throws an exception if file can not be opened
         sys.exit("\nError! Open file operation cannot be performed.\n")
+
 
 def main():
     if len(sys.argv) != 6:
@@ -64,8 +76,8 @@ def main():
     N = int(sys.argv[4])         # Window size
     MSS = int(sys.argv[5])       # Maximum segment size
 
-    clientIP = socket.gethostbyname(socket.gethostname())
-    clientPortNum = '1025'
+    clientIP = socket.gethostbyname(socket.gethostname()) # IP address of the client
+    clientPortNum = '1025' # Arbitary port number which is not well-known
 
     clientSocket = socket(AF_INET, SOCK_DGRAM)
     clientSocket.bind(clientIP, clientPortNum)
@@ -73,27 +85,35 @@ def main():
 
     read_and_create_packet(fileName, MSS)
 
+    # Starting the timer
     startTime = time.time()
 
-    ackReceiveThread = threading.Thread(target = ack_receiver, args = (clientSocket))
+    # Creating threads
+    ackReceiveThread = threading.Thread(target = ack_receiver, args = (clientSocket,))
     rdtSendThread = threading.Thread(target = rdt_send, \
                     args = (serverAddress, clientSocket, N))
 
+    # Starting threads
     ackReceiveThread.start()
     rdtSendThread.start()
 
+    # Wait until all the threads are complete
     ackReceiveThread.join()
     rdtSendThread.join()
 
-    print("\nSending Complete!\n")
+    print("\nTransfer Complete!\n")
 
+    # Time taken to send all the packets
     print("Total time taken {} seconds.\n".format(time.time() - startTime))
 
+    # Closing the socket if it is still open
     if clientSocket:
         clientSocket.close()
 
 
-
+'''
+Displays error message if the command line arguments are not given as expected
+'''
 def error_message_for_arguments():
     print("\nPlease enter the details in the below format:")
     print("python client.py <Server IP Address> <Server Port> <File Name> <Window Size> <Maximum Segment Size>\n")
