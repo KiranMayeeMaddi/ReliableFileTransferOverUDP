@@ -158,6 +158,8 @@ def read_and_create_packet(fileName, MSS):
                     dataPackets.append(create_packet(sequenceNum, data))
                     data = ''
                     sequenceNum += 1
+            data = 'EOF'
+            dataPackets.append(create_packet(sequenceNum, data))
             filePtr.close() # Closing the file pointer
     except: # throws an exception if file can not be opened
         sys.exit("\nError! Open file operation cannot be performed.\n")
@@ -176,7 +178,7 @@ def main():
     N = int(sys.argv[4])         # Window size
     MSS = int(sys.argv[5])       # Maximum segment size
 
-    clientIP = socket.gethostbyname(socket.gethostname()) # IP address of the client
+    clientIP = socket.gethostbyname(socket.gethostname()) # IP address of the client (current machine)
     clientPortNum = 1026 # Arbitary port number which is not well-known
 
     clientSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
