@@ -15,7 +15,7 @@ import time
 # Constants
 TYPE_DATA = 21845  # 0101010101010101
 TYPE_ACK = 43690  # 1010101010101010
-retransmissionTime = 0.1  # RTT value
+retransmissionTime = 0.05  # RTT value
 
 # Initialization
 dataPackets = []
