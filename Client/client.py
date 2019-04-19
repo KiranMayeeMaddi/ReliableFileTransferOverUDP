@@ -6,9 +6,9 @@ import threading
 import time
 
 # Constants
-TYPE_DATA = 21845 #0101010101010101
-TYPE_ACK = 43690 #1010101010101010
-retransmissionTime = 0.1 #RTT value
+TYPE_DATA = 21845  # 0101010101010101
+TYPE_ACK = 43690  # 1010101010101010
+retransmissionTime = 0.1  # RTT value
 
 # Initialization
 dataPackets = []
@@ -102,7 +102,7 @@ def ack_receiver(clientSocket):
 
 
 '''
-Calculates the checksum which needs to be added to the header of the packet
+checksum_calculation() Calculates the checksum which needs to be added to the header of the packet
 @params data
 @return checkSum which is a 16 bit value
 '''
