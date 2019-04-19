@@ -1,6 +1,6 @@
 
 import sys
-from socket import *
+import socket
 import struct
 import threading
 import time
@@ -10,6 +10,7 @@ retransmissionTime = 0.1 #RTT value
 dataPackets = []
 windowLock = threading.Lock()
 previousAck = -1 # intial value
+inTransitSize = 0
 timeStamp = []
 
 def rdt_send(serverAddress, clientSocket, N):
@@ -18,12 +19,12 @@ def rdt_send(serverAddress, clientSocket, N):
     global inTransitSize
     global timeStamp
 
-    timeStamp = [len(Data_Packets)]
+    timeStamp = [len(dataPackets)]
 
     while previousAck + 1 < len(dataPackets):
         windowLock.acquire()
-        packetCount = previousAck + In_Transit + 1
-        if inTransitSize < N and  packetCount < len(dataPackets)):
+        packetCount = previousAck + inTransitSize + 1
+        if inTransitSize < N and  packetCount < len(dataPackets):
             clientSocket.sendto(dataPackets[packetCount], serverAddress)
             timeStamp[packetCount] = time.time()
             inTransitSize += 1
@@ -107,10 +108,10 @@ def main():
     MSS = int(sys.argv[5])       # Maximum segment size
 
     clientIP = socket.gethostbyname(socket.gethostname()) # IP address of the client
-    clientPortNum = '1025' # Arbitary port number which is not well-known
+    clientPortNum = 1025 # Arbitary port number which is not well-known
 
-    clientSocket = socket(AF_INET, SOCK_DGRAM)
-    clientSocket.bind(clientIP, clientPortNum)
+    clientSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    clientSocket.bind((clientIP, clientPortNum))
     serverAddress = (serverIP, serverPortNum)
 
     read_and_create_packet(fileName, MSS)
