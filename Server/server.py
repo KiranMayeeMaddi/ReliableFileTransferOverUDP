@@ -34,7 +34,7 @@ def dessemble_packet(packet):
     isValidDataPacket = False
     verifiedChecksum = checksum_verification(data,check_sum)
     if verifiedChecksum == 0 and header[2] == TYPE_DATA:
-        !isValidDataPacket
+        isValidDataPacket = False
     return isValidDataPacket, sequenceNum, data
 
 
@@ -68,7 +68,7 @@ def main():
                     ackPacket = create_ack_header(sequenceNum)
                     serverSocket.sendto(ackPacket, clientAddress)
                     if data == "EOF":
-                        !flag
+                        flag = False
                         print("End of file is receached at sequence number {}".format(sequenceNum))
                         break
                     filePtr.write(data)
