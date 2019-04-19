@@ -5,13 +5,17 @@ import struct
 import threading
 import time
 
+# Constants
 TYPE_DATA = 21845 #0101010101010101
+TYPE_ACK = 43690 #1010101010101010
 retransmissionTime = 0.1 #RTT value
+
+# Initialization
 dataPackets = []
-windowLock = threading.Lock()
 previousAck = -1 # intial value
 inTransitSize = 0
 timeStamp = []
+windowLock = threading.Lock()
 
 '''
 rdt_send() checks with the window size N, if less than N segments are outstanding it transmits the newly
@@ -19,7 +23,6 @@ formed segment to the server in a UDP packet.
 @params serverAddress, clientSocket, N
 This function uses locks in order to ensure synchronization.
 '''
-
 def rdt_send(serverAddress, clientSocket, N):
     global dataPackets
     global previousAck
@@ -33,6 +36,7 @@ def rdt_send(serverAddress, clientSocket, N):
         packetCount = previousAck + inTransitSize + 1
         # Checking size with respect to window size so as to send the packets
         if inTransitSize < N and  packetCount < len(dataPackets):
+            # Attach server name, port to message; send into socket
             clientSocket.sendto(dataPackets[packetCount], serverAddress)
             # Current time is recorded as the timestamp for the sent packet
             timeStamp[packetCount] = time.time()
@@ -44,9 +48,57 @@ def rdt_send(serverAddress, clientSocket, N):
                 inTransitSize = 0
         windowLock.release() # Unlocks the execution
 
+'''
+ackValidityCheck() checks if the received packet is ACK or not
+@params Acknowldgement Packet
+@return acknowledgement packet validity and sequence number
+'''
+def ackValidityCheck(ackData):
+    ack = struct.unpack('!IHH', ackData)
+    # A 16-bit field that is all zeroes, and
+    # A 16-bit field that has the value TYPE_ACK (1010101010101010), indicates that this is an ACK packet
+    if ack[1] == 0 and ack[2] == TYPE_ACK:
+        return True, ack[0] # ack[0] specifies sequence number
+    else:
+        print("This is not an ACK Packet")
+        return False, ack[0] # ack[0] specifies sequence number
 
+
+'''
+ack_receiver() Checks for ACK packet and proceeds with updating the transit size and acknowledgement count
+Maintains synchronization because of locks
+@params clientSocket
+'''
 def ack_receiver(clientSocket):
-    print()
+    global dataPackets
+    global previousAck
+    global inTransitSize
+    global timeStamp
+
+    try:
+        while previousAck + 1 < len(dataPackets):
+            if inTransitSize > 0:
+                # Read reply characters from socket into string
+                ackData, serverAddress = clientSocket.recvfrom(2048)
+
+                isValidAck, sequenceNum = ackValidityCheck(ackData)
+                windowLock.acquire() # Locks the execution
+                if isValidAck:
+                    # Specifies the acknowledgement for the correct retransmissionTime
+                    # Thus, we increase the number of sent acknowledgement count
+                    # And reduce the in transit size
+                    if previousAck + 1 == sequenceNum:
+                        previousAck += 1
+                        inTransitSize -= 1
+                    else:
+                        inTransitSize = 0
+                else:
+                    inTransitSize = 0
+
+                windowLock.release() # Unlocks the execution
+    except:
+        clientSocket.close()
+        sys.exit("Connection Closed!")
 
 
 '''
@@ -118,7 +170,7 @@ def main():
     MSS = int(sys.argv[5])       # Maximum segment size
 
     clientIP = socket.gethostbyname(socket.gethostname()) # IP address of the client
-    clientPortNum = 1025 # Arbitary port number which is not well-known
+    clientPortNum = 1026 # Arbitary port number which is not well-known
 
     clientSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     clientSocket.bind((clientIP, clientPortNum))
