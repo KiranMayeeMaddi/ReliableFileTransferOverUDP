@@ -13,6 +13,13 @@ previousAck = -1 # intial value
 inTransitSize = 0
 timeStamp = []
 
+'''
+rdt_send() checks with the window size N, if less than N segments are outstanding it transmits the newly
+formed segment to the server in a UDP packet.
+@params serverAddress, clientSocket, N
+This function uses locks in order to ensure synchronization.
+'''
+
 def rdt_send(serverAddress, clientSocket, N):
     global dataPackets
     global previousAck
@@ -22,17 +29,20 @@ def rdt_send(serverAddress, clientSocket, N):
     timeStamp = [len(dataPackets)]
 
     while previousAck + 1 < len(dataPackets):
-        windowLock.acquire()
+        windowLock.acquire() # Locks the execution
         packetCount = previousAck + inTransitSize + 1
+        # Checking size with respect to window size so as to send the packets
         if inTransitSize < N and  packetCount < len(dataPackets):
             clientSocket.sendto(dataPackets[packetCount], serverAddress)
+            # Current time is recorded as the timestamp for the sent packet
             timeStamp[packetCount] = time.time()
             inTransitSize += 1
         if inTransitSize > 0:
+            # If there is a time out then displaying the respective sequence number
             if (time.time() - timeStamp[previousAck + 1]) > retransmissionTime:
                 print("Time out, Sequence Number = {}".format(str(previousAck + 1)))
                 inTransitSize = 0
-        windowLock.release()
+        windowLock.release() # Unlocks the execution
 
 
 def ack_receiver(clientSocket):
