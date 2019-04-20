@@ -90,10 +90,10 @@ def main():
             else:
                 print("Packet Loss, Sequence Number = {}".format(str(sequenceNum)))
 
-    print("File Received. Closing Connection!")
 
     for i in range(maxSeqNum - 1):
         filePtr.write(buffer[i])
+    print("File Received. Closing Connection!")
     # Closing file pointer and socket connection
     filePtr.close()
     serverSocket.close()
