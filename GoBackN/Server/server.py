@@ -58,7 +58,7 @@ def main():
     # Getting the values of server port number, file name, probability at which a packet can be lost
     serverPortNum = 7735 if sys.argv[1] != '7735' else int(sys.argv[1])
     fileName = sys.argv[2]
-    probability = float(sys.argv[3])
+    probLoss = float(sys.argv[3])
 
     serverIP = socket.gethostbyname(socket.gethostname()) # IP address of the server (current machine)
 
@@ -78,7 +78,7 @@ def main():
         isValidDataPacket, sequenceNum, data = dessemble_packet(data)
 
         if isValidDataPacket:
-            if random.uniform(0, 1) > probability:  # packet accepted
+            if random.uniform(0, 1) > probLoss:  # packet accepted
                 if sequenceNum == previousSeqNum + 1:
                     ackPacket = create_ack_header(sequenceNum)
                     serverSocket.sendto(ackPacket, clientAddress)
