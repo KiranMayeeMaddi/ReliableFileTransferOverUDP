@@ -2,9 +2,6 @@
 '''
 server.py
 Go Back N protocol using UDP Sockets
-Authors :-
-Sai Kiran Mayee Maddi 200257327 smaddi@ncsu.edu
-Abhishek Arya 200206728 aarya@ncsu.edu
 '''
 import sys
 import socket
@@ -15,6 +12,11 @@ import random
 TYPE_DATA = 21845  # 0101010101010101
 TYPE_ACK = 43690  # 1010101010101010
 
+'''
+checksum_verification() Calculates and verifies the checksum with the obtained checksum in the packet
+@params data, obtained check sum
+@return A 16 bit value
+'''
 def checksum_verification(data, obtainedCheckSum):
     checkSum = 0
     for i in range(0, len(data), 2):
@@ -24,12 +26,20 @@ def checksum_verification(data, obtainedCheckSum):
             checkSum =  (sumOf16bits & 0xffff) + (sumOf16bits >> 16)
     return (checkSum & 0xffff) & (obtainedCheckSum)
 
-
+'''
+create_ack_header() creates the header for the acknowledgement
+@params sequence number
+@return acknowledgement packet
+'''
 def create_ack_header(sequenceNum):
-    ackPacket = struct.pack('!IHH', sequenceNum, 0, TYPE_ACK)  # SEQUENCE NUMBER BEING ACKED
+    ackPacket = struct.pack('!IHH', sequenceNum, 0, TYPE_ACK)
     return ackPacket
 
-
+'''
+dessemble_packet() checks if the obtained packet is the data backet and separates sequence number, checksum and data
+@params packet
+@return isValidDataPacket: bool check for the data packet, sequenceNum, data
+'''
 def dessemble_packet(packet):
     header = struct.unpack('!IHH', packet[0:8])
     sequenceNum, checkSum, data = header[0], header[1], packet[8:]
@@ -55,6 +65,7 @@ def main():
     print("\nServer IP Address: {}\nServer Port Number: {}\n".format(serverIP, serverPortNum))
 
     serverSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    # Bind socket to a port number
     serverSocket.bind((serverIP, serverPortNum))
 
     previousSeqNum = -1
@@ -73,7 +84,7 @@ def main():
                     serverSocket.sendto(ackPacket, clientAddress)
                     if data == "EOF":
                         flag = False
-                        print("End of file is receached at sequence number {}".format(str(sequenceNum)))
+                        print("End of file is reached at sequence number {}".format(str(sequenceNum)))
                         break
                     filePtr.write(data)
                     previousSeqNum = sequenceNum
@@ -86,7 +97,9 @@ def main():
     filePtr.close()
     serverSocket.close()
 
-
+'''
+Displays error message if the command line arguments are not given as expected
+'''
 def error_message_for_arguments():
     print("\nPlease enter the details in the below format:")
     print("python server.py  <Server Port> <File Name> <Probability> \n")
