@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 server.py
-Go Back N protocol using UDP Sockets
+Selective Repeat protocol using UDP Sockets
 '''
 import sys
 import socket
