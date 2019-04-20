@@ -130,8 +130,7 @@ TYPE_DATA value indicates that this is a data packet
 def create_packet(sequenceNum, data):
     checkSum = checksum_calculation(data)
     header = struct.pack('!IHH', sequenceNum, checkSum, TYPE_DATA)
-    dataPacket = header + data
-    return dataPacket
+    return (header + data)
 
 
 '''
