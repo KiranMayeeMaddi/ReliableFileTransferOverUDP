@@ -1,4 +1,4 @@
-**IP Project 2:**  Go Back N Protocol over UDP <br/>
+**IP Project 2:**  Selective Repeat ARQ Protocol over UDP <br/>
 
 **Team** <br/>
 1. Sai Kiran Mayee Maddi(smaddi) - 200257327 <br/>
@@ -24,3 +24,4 @@ Following are the steps to run the application -
 
 The time taken to execute the program is displayed by client.py <br/>
 **NOTE:** Run step 1 and step 2 in the same order.  <br/>
+
