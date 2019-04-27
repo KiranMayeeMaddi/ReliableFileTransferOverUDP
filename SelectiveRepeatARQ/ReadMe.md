@@ -11,8 +11,8 @@ Following are the steps to run the application -
 **Step 1 - Server Setup:**  <br/>
 1. Navigate to the server directory where server.py file is located. <br/>
 2. Run Server file server.py using the following command: <br/>
-    python server.py <portNumber: 7735> <fileName: serverTest.txt>  <probability: 0.05 > (if only python 3 is installed in your system) <br/>
-    python3 server.py <portNumber: 7735> <fileName: serverTest.txt> <probability: 0.05 >  (if multiple version of python is installed) <br/>
+    python server.py <portNumber: 7735> <fileName: serverTest.txt>  <probability: 0.05> (if only python 3 is installed in your system) <br/>
+    python3 server.py <portNumber: 7735> <fileName: serverTest.txt> <probability: 0.05>  (if multiple version of python is installed) <br/>
     **Example:** python server.py 7735 'serverTest.txt' 0.05 <br/>
 
 
