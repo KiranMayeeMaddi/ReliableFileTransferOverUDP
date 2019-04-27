@@ -9,12 +9,13 @@ This application is coded and tested on Python 3.
 Following are the steps to run the application -   
 
 **Step 1 - Server Setup:**  
-1. Navigate to the server directory where server.py file is located.
-2. Run Server file server.py using the following command:
-    python server.py <portNumber: 7735> <fileName: serverTest.txt>  <probability: 0.05 > (if only python 3 is installed in your system)
-    python3 server.py <portNumber: 7735> <fileName: serverTest.txt> <probability: 0.05 >  (if multiple version of python is installed)  
-    **Example:** python server.py 7735 'serverTest.txt' 0.05
-
+<ul>
+<li> 1. Navigate to the server directory where server.py file is located. </li>
+<li> 2. Run Server file server.py using the following command: </li>
+    <li> python server.py <portNumber: 7735> <fileName: serverTest.txt>  <probability: 0.05 > (if only python 3 is installed in your system) </li>
+    <li> python3 server.py <portNumber: 7735> <fileName: serverTest.txt> <probability: 0.05 >  (if multiple version of python is installed)  </li>
+   <li>  **Example:** python server.py 7735 'serverTest.txt' 0.05 </li>
+</ul>
 
 **Step 2 - Client Setup:**  
 1. Navigate to the client directory where client.py file is located and run the command after knowing the server IP address:
