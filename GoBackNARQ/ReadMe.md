@@ -1,10 +1,10 @@
-**IP Project 2:**  Go Back N Protocol over UDP
+**IP Project 2:**  Go Back N Protocol over UDP <br/>
 
-**Team**
-1.. Sai Kiran Mayee Maddi(smaddi) - 200257327
-2. Abhishek Arya(aarya) - 200206728
+**Team** <br/>
+1.Sai Kiran Mayee Maddi(smaddi) - 200257327 <br/>
+2. Abhishek Arya(aarya) - 200206728 <br/>
 
-This application is coded and tested on Python 3. 
+This application is coded and tested on Python 3.  <br/>
 
 Following are the steps to run the application -   
 
@@ -22,5 +22,5 @@ Following are the steps to run the application -
     python3 client.py <serverIP > <serverPortNumber: 7735> <fileName :clienttest.txt> <N window size: 64> <MSS :600> (if multiple version of python is installed) <br/>
     **Example:** python client.py 198.62.08.96 7735 'clientTest.txt' 64 600 <br/>
 
-The time taken to execute the program is displayed by client.py
-**NOTE:** Run step 1 and step 2 in the same order. 
+The time taken to execute the program is displayed by client.py <br/>
+**NOTE:** Run step 1 and step 2 in the same order.  <br/>
