@@ -1,6 +1,6 @@
 '''
 client.py
-Go Back N protocol using UDP Sockets
+Selective Repeat ARQ protocol using UDP Sockets
 '''
 
 import sys
@@ -101,7 +101,7 @@ Maintains synchronization because of locks
 def ack_receiver(clientSocket):
     global isPacketTransferred
     global slidingWindow
-    global dataPackets
+    global windowLock
 
     try:
         while len(slidingWindow) > 0 or isPacketTransferred:
@@ -115,10 +115,10 @@ def ack_receiver(clientSocket):
                     if sequenceNum in slidingWindow:
                         windowLock.acquire() # Locks the execution
                         del (slidingWindow[sequenceNum])
-                    if len(dataPackets) == sequenceNum + 1:
-                        print("Last acknowledgement received!!")
+                        if len(dataPackets) == sequenceNum + 1:
+                            print("Last acknowledgement received!!")
 
-                    windowLock.release() # Unlocks the execution
+                        windowLock.release() # Unlocks the execution
     except:
         clientSocket.close()
         sys.exit("Connection Closed!")
